@@ -1,4 +1,5 @@
 ﻿using Datafeel;
+using FluentModbus;
 using System;
 
 /**
@@ -8,12 +9,12 @@ using System;
  */
 
 
-var manager = new DotManager(1);
-manager.Start();
+var manager = new DotManager();
+manager.Connect(1);
 
-var props = new DotPropsJson() // Vessel for our WriteCommand
+var props = new DotPropsWritable(1) // Vessel for our WriteCommand
 {
-    Address = 1,
+    //Address = 1,
     LedMode = LedMode.GlobalManual,
     GlobalLed = new RgbLed()
     {

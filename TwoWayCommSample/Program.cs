@@ -8,13 +8,12 @@
  * It continously goes back and forth between hot and cold until the program is ended where it sets the Dot to be off.
  */
 
-List<Byte> Addresses = new List<Byte>() {1};
-var manager = new DotManager(Addresses);    // using the Address list constructor overload
-manager.Start();
 
-var props = new DotPropsJson()
+var manager = new DotManager();
+manager.Connect(1);
+
+var props = new DotPropsWritable(1)
 {
-    Address = 1,                            // address should to match the Address given to the DotManager
     LedMode = LedMode.GlobalManual,
     GlobalLed = new RgbLed()
     {
@@ -42,12 +41,13 @@ while (!Console.KeyAvailable)
     {
         props.ThermalIntensity = 1;         // turn it cold
     }
-    else if (CurrentTemp < minTemp) { 
+    else if (CurrentTemp < minTemp)
+    {
         props.ThermalIntensity = -1;        // turn it hot
     }
 
     // set the color of all LEDs (global) based on the temperature reported by the dot
-    (byte red ,byte green ,byte blue) = TemperatureToRGB(CurrentTemp,minTemp,maxTemp);
+    (byte red, byte green, byte blue) = TemperatureToRGB(CurrentTemp, minTemp, maxTemp);
     props.GlobalLed.Red = red;
     props.GlobalLed.Green = green;
     props.GlobalLed.Blue = blue;
@@ -57,13 +57,13 @@ while (!Console.KeyAvailable)
 }
 
 // Turn off the Dot settings
-await manager.SendWriteCommand(new DotPropsOutputsOff(props.Address));
+await manager.SendWriteCommand(new DotPropsWritableOff(props.Address));
 manager.Dispose();
 
 
 
 // --- helper function --- 
- static (byte, byte, byte) TemperatureToRGB(float temp, float minTemp, float maxTemp)
+static (byte, byte, byte) TemperatureToRGB(float temp, float minTemp, float maxTemp)
 {
     // Clamp the temperature to be within the min and max range
     temp = Math.Max(minTemp, Math.Min(maxTemp, temp));

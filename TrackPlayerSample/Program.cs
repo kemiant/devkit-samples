@@ -8,10 +8,10 @@
 
 
 string fileName = "my-track.json";
-var manager = new DotManager(1);
-manager.Start();
+var manager = new DotManager();
+manager.Connect(1);
 
 var trackPlayer = new TrackPlayer(manager);
-string path = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\Tracks\",fileName));
+string path = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\Tracks\", fileName));
 await trackPlayer.PlayTrack(path);
 
