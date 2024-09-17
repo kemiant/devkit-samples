@@ -7,7 +7,16 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DatafeelSDK" Version="1.0.2" />
-    <PackageReference Include="FluentModbus" Version="5.2.0" />
+    <PackageReference Include="DatafeelSDK" Version="1.0.7" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="FluentModbus">
+      <HintPath>..\DotCommandSample\DF-FluentModbus\FluentModbus.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="DF-FluentModbus\FluentModbus.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

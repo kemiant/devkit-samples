@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotWriteCommandSample", "Do
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedbackLoopSample", "TwoWayCommSample\FeedbackLoopSample.csproj", "{780B7503-352C-4928-8FFC-7EF073C2CA4A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackPlayerSample", "TrackPlayerSample\TrackPlayerSample.csproj", "{FC0404FB-E607-448F-9A00-D822B8D011D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrackPlayerSample", "TrackPlayerSample\TrackPlayerSample.csproj", "{FC0404FB-E607-448F-9A00-D822B8D011D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LowLevelSample", "LowLevelSample\LowLevelSample.csproj", "{C175CD44-BF09-4759-83D4-9E4E30B8A535}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LowLevelSample", "LowLevelSample\LowLevelSample.csproj", "{C175CD44-BF09-4759-83D4-9E4E30B8A535}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

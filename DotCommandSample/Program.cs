@@ -1,11 +1,9 @@
 ﻿using Datafeel;
 using FluentModbus;
-using System;
-
 /**
- * Sample Project showcasing the use of the DotProps when wanting to istruct DataFeel dots using SendWriteCommand()
+ * Sample Project showcasing the use of the DotProps when wanting to istruct DataFeel dots using Write()
  * In this sample the Dot LEDs are in GlobalManual mode, and their RGBs are all set to the same value that changes every 100 MS.
- * This is then packaged in to a DotPropsJson, and sent to the Dot using the SendWriteCommand() call.
+ * This is then packaged in to a DotPropsJson, and sent to the Dot using the Write() call.
  */
 
 
@@ -15,7 +13,7 @@ manager.Connect(1);
 var props = new DotPropsWritable(1) // Vessel for our WriteCommand
 {
     //Address = 1,
-    LedMode = LedMode.GlobalManual,
+    LedMode = LedModes.GlobalManual,
     GlobalLed = new RgbLed()
     {
         Red = 0,
@@ -29,12 +27,15 @@ var random = new Random();
 while (!Console.KeyAvailable)
 {
     // Set Global RGB values
-    props.GlobalLed.Red = (byte)random.Next(0, 50);
-    props.GlobalLed.Green = (byte)random.Next(0, 50);
-    props.GlobalLed.Blue = (byte)random.Next(0, 50);
+    props.GlobalLed = new RgbLed()
+    {
+        Red = (byte)random.Next(0, 50),
+        Green = (byte)random.Next(0, 50),
+        Blue = (byte)random.Next(0, 50)
+    };
     // Send the WriteCommand to the Dot
-    await manager.SendWriteCommand(props);
+    await manager.Write(props);
     await Task.Delay(100);
 }
 
-manager.Dispose();
+await manager.Disconnect();

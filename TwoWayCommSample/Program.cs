@@ -1,4 +1,5 @@
 ﻿using Datafeel;
+using FluentModbus;
 
 /**
  * Sample Project showcasing receiving sensor data from the DataFeel dot and Sending in commands based on the read value.
@@ -12,17 +13,18 @@
 var manager = new DotManager();
 manager.Connect(1);
 
-var props = new DotPropsWritable(1)
+var props = new DotPropsWritable()
 {
-    LedMode = LedMode.GlobalManual,
+    Address = 1,
+    LedMode = LedModes.GlobalManual,
     GlobalLed = new RgbLed()
     {
         Red = 0,
         Green = 0,
         Blue = 0
     },
-    ThermalMode = ThermalMode.OpenLoop,
-    ThermalIntensity = 1                    //Start on cold 
+    ThermalMode = ThermalModes.Manual,
+    ThermalIntensity = 1f                   //Start on cold 
 };
 
 float CurrentTemp = 25.0f;
@@ -33,7 +35,7 @@ Console.WriteLine("Press any key to stop");
 while (!Console.KeyAvailable)
 {
     // read all sensor data
-    var resultsProps = await manager.SendReadCommand(props);
+    var resultsProps = await manager.Read(props);
     CurrentTemp = (float)resultsProps.SkinTemperature;
 
     Console.WriteLine(resultsProps.SkinTemperature);
@@ -48,17 +50,19 @@ while (!Console.KeyAvailable)
 
     // set the color of all LEDs (global) based on the temperature reported by the dot
     (byte red, byte green, byte blue) = TemperatureToRGB(CurrentTemp, minTemp, maxTemp);
-    props.GlobalLed.Red = red;
-    props.GlobalLed.Green = green;
-    props.GlobalLed.Blue = blue;
-
-    await manager.SendWriteCommand(props);
+    props.GlobalLed = new RgbLed()
+    {
+        Red = red,
+        Green = green,
+        Blue = blue
+    };
+    await manager.Write(props);
     await Task.Delay(50);
 }
 
 // Turn off the Dot settings
-await manager.SendWriteCommand(new DotPropsWritableOff(props.Address));
-manager.Dispose();
+await manager.Write(new DotPropsOutputsOff(props.Address));
+await manager.Disconnect();
 
 
 

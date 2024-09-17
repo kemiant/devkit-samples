@@ -1,44 +1,53 @@
-﻿using Datafeel;
-/**
- * Sample Project showcasing the direct low level calls to the dot object, as opposed to using the DotManager, to send instructions to the dot.
- * In this sample the dot object and the Modbus Client are created manually and seperately from one another. 
- * The dot is set to be Global LED mode and sequence vibration mode, it then calls onto the WriteALLSetting() which writes the corresponding byte onto the modbus registers.
- * This sample demonstrates the use of the sequence mode where one queue up a selection of pre-defined vibration patterns.
- */
+﻿// See https://aka.ms/new-console-template for more information
+using Datafeel;
+using FluentModbus;
+
 var client = ModbusClientProvider.CreateRtuSerialClient();
-var dot = new DotV5(1);
+client.Connect();
+
+// Change depending on your hardware version
+var dot = new DotV6(1);
 
 // LED Settings
 dot.ClearLeds();
-dot.LedMode = LedMode.GlobalManual;
-dot.GlobalLed.Green = 40;
+dot.LedMode = LedModes.GlobalManual;
+dot.GlobalLed = new RgbLed(50, 50, 50);
+dot.IndividualManualLeds[0] = new RgbLed();
+dot.IndividualManualLeds[1] = new RgbLed();
+dot.IndividualManualLeds[2] = new RgbLed();
+dot.IndividualManualLeds[3] = new RgbLed();
+dot.IndividualManualLeds[4] = new RgbLed();
+dot.IndividualManualLeds[5] = new RgbLed();
+dot.IndividualManualLeds[6] = new RgbLed();
+dot.IndividualManualLeds[7] = new RgbLed();
 
 // Thermal Settings
-dot.ThermalMode = ThermalMode.Off;
-dot.ThermalIntensity = 0f;
+dot.ThermalMode = ThermalModes.Off;
+dot.ThermalIntensity = .25f;
 
 // Vibration Settings
-dot.VibrationMode = VibrationMode.Sequence;
+dot.VibrationMode = VibrationModes.Sequence;
 dot.VibrationIntensity = 127;
-dot.VibrationSequence[0].Waveform = VibrationWaveform.StrongClickP100;
-dot.VibrationSequence[1].Waveform = VibrationWaveform.TransitionRampUpLongSmooth1P0ToP50;
-dot.VibrationSequence[2].Waveform = VibrationWaveform.StrongClickP100;
-dot.VibrationSequence[3].Waveform = VibrationWaveform.TransitionRampUpLongSmooth1P0ToP50;
-dot.VibrationSequence[4].Waveform = VibrationWaveform.EndSequence;
+dot.VibrationSequence[0].Waveforms = VibrationWaveforms.StrongClickP100;
+dot.VibrationSequence[1].Waveforms = VibrationWaveforms.TransitionRampUpLongSmooth1P0ToP50;
+dot.VibrationSequence[2].Waveforms = VibrationWaveforms.StrongClickP100;
+dot.VibrationSequence[3].Waveforms = VibrationWaveforms.TransitionRampUpLongSmooth1P0ToP50;
+dot.VibrationSequence[4].Waveforms = VibrationWaveforms.EndSequence;
 
 await Task.Run(async () =>
 {
     var random = new Random();
-    while (!Console.KeyAvailable)
+    while (true)
     {
-        dot.GlobalLed.Red = (byte)random.Next(0, 50);
-        dot.GlobalLed.Green = (byte)random.Next(0, 50);
-        dot.GlobalLed.Blue = (byte)random.Next(0, 50);
+        dot.GlobalLed = new RgbLed()
+        {
+            Red = (byte)random.Next(0, 255),
+            Green = (byte)random.Next(0, 255),
+            Blue = (byte)random.Next(0, 255)
+        };
         dot.VibrationGo = true;
-        await dot.WriteAllSettings(client);
-        await Task.Delay(100);
+        var cts = new CancellationTokenSource(100);
+        await dot.WriteAllSettings(client, cts.Token);
+        await Task.Delay(1000);
     }
-    // clear the LEDs
-    dot.ClearLeds();
-    await dot.WriteAllSettings(client);
 });
