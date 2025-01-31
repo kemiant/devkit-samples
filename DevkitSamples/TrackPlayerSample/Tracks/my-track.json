@@ -7,7 +7,7 @@
           "address": 1,
           "ledMode": "GlobalManual",
           "globalLed": {
-            "red": 50
+            "red": 120
           }
         }
       ],
@@ -18,7 +18,7 @@
         {
           "address": 1,
           "globalLed": {
-            "green": 50
+            "green": 120
           }
         }
       ],
@@ -29,7 +29,7 @@
         {
           "address": 1,
           "globalLed": {
-            "blue": 50
+            "blue": 120
           }
         }
       ],
@@ -40,7 +40,7 @@
         {
           "address": 1,
           "globalLed": {
-            "green": 50
+            "green": 120
           }
         }
       ],
@@ -51,7 +51,7 @@
         {
           "address": 1,
           "globalLed": {
-            "red": 50
+            "red": 120
           }
         }
       ],
