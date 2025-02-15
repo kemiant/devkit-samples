@@ -3,10 +3,10 @@ using Datafeel.NET.Serial;
 using Datafeel.NET.BLE;
 
 var manager = new DotManagerConfiguration()
-    .AddDot(1)
-    .AddDot(2)
-    .AddDot(3)
-    .AddDot(4)
+    .AddDot<Dot_63x_xxx>(1)
+    .AddDot<Dot_63x_xxx>(2)
+    .AddDot<Dot_63x_xxx>(3)
+    .AddDot<Dot_63x_xxx>(4)
     .CreateDotManager();
 
 foreach (var d in manager.Dots)

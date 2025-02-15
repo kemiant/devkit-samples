@@ -10,7 +10,7 @@ var commClient = new DatafeelModbusClientConfiguration()
     .UseWindowsSerialPortTransceiver()
     .CreateClient();
 
-var myDot1 = new Dot_63x_xxx(4);
+var myDot1 = new Dot_63x_xxx(1);
 await commClient.Open();
 
 var random = new Random();
@@ -25,7 +25,11 @@ while (true)
     myDot1.GlobalLed.Blue = (byte)random.Next(0, 255);
     try
     {
-        await myDot1.WriteAllSettings(commClient);
+        using(var writeCancelSource = new CancellationTokenSource(250))
+        {
+            await myDot1.WriteAllSettings(commClient, writeCancelSource.Token);
+        }
+        //await myDot1.WriteAllSettings(commClient);
     }
     catch (Exception e)
     {
