@@ -68,7 +68,7 @@ while (true)
             using (var writeCancelSource = new CancellationTokenSource(250))
             using (var readCancelSource = new CancellationTokenSource(250))
             {
-                await manager.Write(d, writeCancelSource.Token);
+                await manager.Write(d, false, writeCancelSource.Token);
                 var result = await manager.Read(d, readCancelSource.Token);
             }
         }
