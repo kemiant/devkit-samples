@@ -5,18 +5,11 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 
-var logger = new LoggerConfiguration()
-    .MinimumLevel.Is(LogEventLevel.Verbose)
-    .Enrich.FromLogContext()
-    .WriteTo.Console(theme: SystemConsoleTheme.Colored,
-        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level}] ({SourceContext}.{Method}) {Message}{NewLine}{Exception}")
-    .CreateLogger();
 var manager = new DotManagerConfiguration()
     .AddDot<Dot_63x_xxx>(1)
     .AddDot<Dot_63x_xxx>(2)
     .AddDot<Dot_63x_xxx>(3)
     .AddDot<Dot_63x_xxx>(4)
-    .UseLogger(logger)
     .CreateDotManager();
 
 foreach (var d in manager.Dots)
@@ -30,11 +23,9 @@ using (var cts = new CancellationTokenSource(10000))
     {
         var serialClient = new DatafeelModbusClientConfiguration()
             .UseWindowsSerialPortTransceiver()
-            .LogModbusTraffic(logger)
             .CreateClient();
         var bleClient = new DatafeelModbusClientConfiguration()
             .UseNetBleTransceiver()
-            .LogModbusTraffic(logger)
             .CreateClient();
         var clients = new List<DatafeelModbusClient> { serialClient, bleClient };
         var result = await manager.Start(clients, cts.Token);
@@ -52,13 +43,13 @@ using (var cts = new CancellationTokenSource(10000))
         Console.WriteLine(e.Message);
     }
 }
-var random = new Random();
 
 while (true)
 {
     var delay = Task.Delay(2000);
     foreach (var d in manager.Dots)
     {
+        d.VibrationMode = VibrationModes.Library;
         //There can be up to 8 waveforms in the sequence
         d.VibrationSequence[0].Waveforms = VibrationWaveforms.StrongBuzzP100;
         d.VibrationSequence[1].Waveforms = VibrationWaveforms.StrongClick1P100;
