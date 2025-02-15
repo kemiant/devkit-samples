@@ -10,6 +10,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Datafeel" Version="2.0.0-alpha" />
     <PackageReference Include="Datafeel.NET.BLE" Version="2.0.0-alpha" />
