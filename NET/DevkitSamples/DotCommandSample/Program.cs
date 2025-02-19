@@ -8,28 +8,26 @@ var manager = new DotManagerConfiguration()
     .AddDot<Dot_63x_xxx>(4)
     .CreateDotManager();
 
-using (var cts = new CancellationTokenSource(10000))
+try
 {
-    try
+    using var cts = new CancellationTokenSource(10000);
+    var serialClient = new DatafeelModbusClientConfiguration()
+        .UseWindowsSerialPortTransceiver()
+        //.UseSerialPort("COM3") // Uncomment this line to specify the serial port by name
+        .CreateClient();
+    var result = await manager.Start(serialClient, cts.Token);
+    if (result)
     {
-        var serialClient = new DatafeelModbusClientConfiguration()
-            .UseWindowsSerialPortTransceiver()
-            //.UseSerialPort("COM3") // Uncomment this line to specify the serial port by name
-            .CreateClient();
-        var result = await manager.Start(serialClient, cts.Token);
-        if (result)
-        {
-            Console.WriteLine("Started");
-        }
-        else
-        {
-            Console.WriteLine("Failed to start");
-        }
+        Console.WriteLine("Started");
     }
-    catch (Exception e)
+    else
     {
-        Console.WriteLine(e.Message);
+        Console.WriteLine("Failed to start");
     }
+}
+catch (Exception e)
+{
+    Console.WriteLine(e.Message);
 }
 
 var random = new Random();
@@ -45,6 +43,9 @@ while (true)
 
         try
         {
+            // Default timeout is 50ms for both read and write operations
+            // It can be adjusted using DotManager.ReadTimeout and DotManager.WriteTimeout
+            // Alternatively, you can pass in your own CancellationToken.
             await d.Write();
             await d.Read();
             Console.WriteLine($"Skin Temperature:     {d.SkinTemperature}");

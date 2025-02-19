@@ -52,6 +52,9 @@ while (true)
 
         try
         {
+            // Default timeout is 50ms for both read and write operations
+            // It can be adjusted using DotManager.ReadTimeout and DotManager.WriteTimeout
+            // Alternatively, you can pass in your own CancellationToken.
             await manager.Write(d);
             var result = await manager.Read(d);
             Console.WriteLine($"Skin Temperature:     {result.SkinTemperature}");
