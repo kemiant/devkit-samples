@@ -17,34 +17,29 @@ var dots = new List<DotPropsWritable>()
     new DotPropsWritable() { Address = 4, LedMode = LedModes.GlobalManual, GlobalLed = new() },
 };
 
-using (var cts = new CancellationTokenSource(10000))
+try
 {
-    try
-    {
+    using var cts = new CancellationTokenSource(10000);
         var serialClient = new DatafeelModbusClientConfiguration()
-            .UseWindowsSerialPortTransceiver()
-            .CreateClient();
-        var bleClient = new DatafeelModbusClientConfiguration()
-            .UseNetBleTransceiver()
-            .CreateClient();
-        var clients = new List<DatafeelModbusClient> { serialClient, bleClient };
-        var result = await manager.Start(clients, cts.Token);
-        if (result)
-        {
-            Console.WriteLine("Started");
-        }
-        else
-        {
-            Console.WriteLine("Failed to start");
-        }
-    }
-    catch (Exception e)
+        .UseWindowsSerialPortTransceiver()
+        //.UseSerialPort("COM3") // Uncomment this line to specify the serial port by name
+        .CreateClient();
+    var result = await manager.Start(serialClient, cts.Token);
+    if (result)
     {
-        Console.WriteLine(e.Message);
+        Console.WriteLine("Started");
+    }
+    else
+    {
+        Console.WriteLine("Failed to start");
     }
 }
-var random = new Random();
+catch (Exception e)
+{
+    Console.WriteLine(e.Message);
+}
 
+var random = new Random();
 while (true)
 {
     var delay = Task.Delay(1000);
@@ -57,13 +52,9 @@ while (true)
 
         try
         {
-            using (var writeCancelSource = new CancellationTokenSource(250))
-            using (var readCancelSource = new CancellationTokenSource(250))
-            {
-                await manager.Write(d, true, writeCancelSource.Token);
-                var result = await manager.Read(d, readCancelSource.Token);
-                Console.WriteLine($"Skin Temperature:     {result.SkinTemperature}");
-            }
+            await manager.Write(d);
+            var result = await manager.Read(d);
+            Console.WriteLine($"Skin Temperature:     {result.SkinTemperature}");
         }
         catch (Exception e)
         {

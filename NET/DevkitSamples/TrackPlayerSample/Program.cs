@@ -1,6 +1,5 @@
 ﻿using Datafeel;
 using Datafeel.NET.Serial;
-using Datafeel.NET.BLE;
 using System.Reflection;
 
 var manager = new DotManagerConfiguration()
@@ -12,6 +11,7 @@ var manager = new DotManagerConfiguration()
 
 var client = new DatafeelModbusClientConfiguration()
     .UseWindowsSerialPortTransceiver()
+    //.UseSerialPort("COM3") // Uncomment this line to specify the serial port by name
     .CreateClient();
 
 var trackPlayer = new TrackPlayer(manager);
