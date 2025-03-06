@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <title>Text Highlighter & Haptic Feedback</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(-45deg, #ffeeaa, #ffcbab, #f89354, #ffe26c);
+            background-size: 400% 400%;
+            animation: gradientBG 10s ease infinite;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px;
+            margin: 0;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .highlighted { font-weight: bold; padding: 2px; cursor: pointer; }
+        .yellow { background-color: rgb(255, 255, 128); }
+        .red { background-color: rgb(255, 119, 119); color: white; }
+        .blue { background-color: rgb(85, 85, 255); color: white; }
+        .green { background-color: rgb(95, 255, 95); color: white; }
+        .note-box { margin-top: 10px; padding: 10px; border: 1px solid #ccc; background-color: #f9f9f9; }
+        .hidden { display: none; }
+
+
+        .main-container {
+            width: 95%;
+            height: 90%;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 20px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: left;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #EEE;
+        }
+
+        .title {
+            font-size: 48px;
+            font-weight: normal;
+            color: #0d0a00;
+            position: absolute;
+            top: 60px;
+            left: 130px;
+            text-align: left;
+        }
+
+        .instructions {
+            position: absolute;
+            top: 150px;
+            left: 150px;
+            text-align: left;
+            font-size: 25px;
+        }
+
+
+        .buttons {
+            position: absolute;
+            bottom: 90px;
+            right: 110px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .buttons button {
+            background: #FFA500;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 20px;
+        }
+
+        .buttons button:hover {
+            background: #FF8C00;
+        }
+
+
+        #yellow { background-color: rgb(244, 244, 0); border-color: yellow; color: white;}
+        #red { background-color: rgb(255, 110, 110); border-color: red; color: white; }
+        #blue { background-color: rgb(102, 102, 255); border-color: blue; color: white; }
+        #green { background-color: rgb(0, 185, 0); border-color: green; color: white; }
+
+
+        /* Improved Two-column text content */
+
+
+        #left-column {
+            width: 35%;  /* Adjust width to balance columns */
+            text-align: justify;
+            font-size: 26px;
+            position: absolute;
+            line-height: 1.6;
+            color: #333;
+            padding-right: 10px; /* Small padding to prevent overlap */
+            left: 170px;
+            top: 210px;
+        }
+
+        /* Right Column */
+        #right-column {
+            width: 35%; /* Matches left column */
+            text-align: justify;
+            position: absolute;
+            font-size: 26px;
+            line-height: 1.6;
+            color: #333;
+            right: 270px;
+            top: 210px;
+        }
+
+                /* Progress Bar Container */
+        .progress-container {
+            width: 70%; /* Adjust width to match text container */
+            height: 8px; /* Height of the progress bar */
+            background: #d3d3d3; /* Light gray background */
+            border-radius: 5px;
+            position: absolute;
+            bottom: 70px; /* Distance from bottom */
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        /* Progress Fill */
+        .progress-bar {
+            height: 8px;
+            width: 40%; /* Adjust progress percentage */
+            background: #aaaaaa; /* Darker gray */
+            border-radius: 5px;
+            position: absolute;
+            top: 0px;
+        }
+
+        /* Progress Circle */
+        .progress-circle {
+            width: 20px;
+            height: 20px;
+            background: #888888; /* Medium gray */
+            border-radius: 50%;
+            position: absolute;
+            left: 40%; /* Match the progress-bar width */
+            top: 50%; /* Moves the circle directly over the bar */
+            transform: translate(-50%, -50%);
+        }
+
+
+                /* Top Right Menu Bar */
+        .top-right-menu {
+            position: absolute;
+            top: 100px;
+            right: 100px;
+            background: #FBC02D; /* Light yellow background */
+            padding: 10px 15px;
+            border-radius: 25px; /* Rounded edges */
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        /* Individual Menu Buttons */
+        .menu-button {
+            width: 70px;
+            height: 70px;
+            
+            background: #E09111; /* Darker orange */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.3s;
+
+        }
+
+        /* Hover Effect */
+        .menu-button:hover {
+            background: #d47f09; /* Slightly darker orange */
+        }
+
+        /* Icons Inside Buttons */
+        .menu-button i {
+            color: white;
+            font-weight: normal;
+            font-size: 30px;
+        }
+
+        /* Custom Alert (Toast Notification) */
+        .custom-alert {
+            position: fixed;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #FFB84D; /* Warm orange background */
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 250px;
+            text-align: center;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        /* Show Alert */
+        .custom-alert.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-10px);
+        }
+
+        /* Hide Alert */
+        .custom-alert.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+                /* Custom Modal Background */
+        .custom-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        /* Hidden Class */
+        .hidden {
+            display: none;
+        }
+
+        /* Modal Content */
+        .modal-content {
+            background: #fff;
+            width: 400px;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Modal Header */
+        .modal-content h3 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        /* Modal Input */
+        #modal-input {
+            width: 90%;
+            height: 80px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+            outline: none;
+            resize: none;
+        }
+
+        /* Modal Buttons */
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .modal-buttons button {
+            width: 45%;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .modal-buttons button:first-child {
+            background: #FFA500;
+            color: #333;
+        }
+
+        .modal-buttons button:first-child:hover {
+            background: #ffd17d;
+        }
+
+        .modal-buttons button:last-child {
+            background: #a4a4a4;
+            color: white;
+        }
+
+        .modal-buttons button:last-child:hover {
+            background: #e8e8e8;
+        }
+
+        .highlighted {
+            border-radius: 8px; /* Adds curved edges */
+        }
+
+
+
+    </style>
+    <script>
+
+
+
+        function getSelectedText() {
+            let selection = window.getSelection();
+            if (selection.rangeCount === 0) return ""; // No selection
+            return selection.toString().trim();
+        }
+
+        function highlightText(color) {
+            let selectedText = getSelectedText();
+            if (!selectedText) {
+                showAlert("Please select text before highlighting.");
+                return;
+            }
+
+            let range = window.getSelection().getRangeAt(0);
+            let span = document.createElement("span");
+            span.className = `highlighted ${color}`;
+            span.textContent = selectedText;
+            span.onclick = function() { replayHapticFeedback(selectedText); };
+
+            range.deleteContents();
+            range.insertNode(span);
+
+            // Send color to backend for haptic feedback
+            fetch("/haptic-feedback", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: selectedText, color: color })
+            });
+
+            window.getSelection().removeAllRanges();
+        }
+
+        let selectedRange = null; // Stores selected text range
+
+        function addNote() {
+            let selection = window.getSelection();
+            if (selection.rangeCount === 0) {
+                showAlert("Please highlight text before adding a note.");
+                return;
+            }
+
+            selectedRange = selection.getRangeAt(0); // ✅ Store the selected text range
+            let selectedText = selection.toString().trim();
+            if (!selectedText) return;
+
+            openModal(selectedText, function(note) {
+                if (!note) return;
+
+                // ✅ Send note & highlighted text to the back-end
+                fetch("/analyze-sentiment", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: note, highlightedText: selectedText }) // ✅ Send both note & text
+                })
+                .then(response => response.json())
+                .then(data => {
+                    let detectedColor = data.color || "yellow"; // ✅ Get the detected color
+                    let detectedEmotion = data.emotion || "neutral";
+
+                    let span = document.createElement("span");
+                    span.textContent = selectedText;
+                    span.className = `highlighted ${detectedColor}`; // ✅ Apply highlight color
+                    span.setAttribute("data-note", note);
+
+                    // ✅ When clicking the annotation, play the haptic feedback
+                    span.onclick = function() { 
+                        replayHapticFeedback(selectedText);
+                        showAlert(`Note: ${note} (Emotion: ${detectedEmotion})`);
+                    };
+
+                    selectedRange.deleteContents(); // ✅ Remove original text
+                    selectedRange.insertNode(span); // ✅ Insert highlighted span
+
+                    showAlert(`Emotion detected: ${detectedEmotion}, color: ${detectedColor}`);
+                });
+                
+                window.getSelection().removeAllRanges(); // ✅ Deselect to keep highlight
+            });
+        }
+
+
+
+
+        function replayHapticFeedback(text) {
+            fetch("/replay-haptic", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: text })
+            })
+            .then(response => response.json())
+            .then(data => {
+                showAlert(`Replaying haptic feedback for: "${text}"`);
+            });
+        }
+
+
+        function toggleHighlightOptions() {
+            let highlightOptions = document.getElementById("highlight-options");
+            let toggleButton = document.getElementById("toggle-highlight");
+
+            if (highlightOptions.classList.contains("hidden")) {
+                highlightOptions.classList.remove("hidden");
+                toggleButton.classList.add("hidden"); // Hide the "Highlight" button
+            } else {
+                highlightOptions.classList.add("hidden");
+                toggleButton.classList.remove("hidden"); // Show the "Highlight" button
+            }
+        }
+
+        function showAlert(message) {
+            let alertBox = document.getElementById("custom-alert");
+            let alertMessage = document.getElementById("alert-message");
+
+            alertMessage.innerText = message;
+            alertBox.classList.remove("hidden");
+            alertBox.classList.add("show");
+
+            // Hide the alert after 3 seconds
+            setTimeout(() => {
+                alertBox.classList.remove("show");
+                alertBox.classList.add("hidden");
+            }, 3000);
+        }
+
+        function openModal(text, callback) {
+            let modal = document.getElementById("custom-modal");
+            let modalText = document.getElementById("modal-text");
+            let modalInput = document.getElementById("modal-input");
+
+            modalText.innerText = `Add a note for: "${text}"`;
+            modalInput.value = "";
+            modal.classList.remove("hidden");
+
+            window.modalCallback = callback;
+        }
+
+        function closeModal(save) {
+            let modal = document.getElementById("custom-modal");
+            let modalInput = document.getElementById("modal-input");
+
+            if (save && window.modalCallback) {
+                window.modalCallback(modalInput.value); // ✅ Pass the note to highlight function
+            }
+
+            modal.classList.add("hidden");
+        }
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            let readAloudButton = document.getElementById("read-aloud");
+
+            if (readAloudButton) {
+                readAloudButton.addEventListener("click", function () {
+                    console.log("📢 Read Aloud button clicked!");
+
+                    // Extract all text from both columns
+                    let leftColumnText = document.getElementById("left-column").innerText;
+                    let rightColumnText = document.getElementById("right-column").innerText;
+                    let fullText = leftColumnText + " " + rightColumnText;
+
+                    // Send request to Flask backend to read the text and trigger haptics
+                    fetch("/speak-haptic", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ text: fullText })  // Send the full text
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("🔊 Server Response:", data);
+                        showAlert(data.message);  // Show alert with message from backend
+
+                        // Change button text dynamically
+                        if (data.message.includes("stopped")) {
+                            readAloudButton.innerText = "🔊 Read Aloud";
+                        } else {
+                            readAloudButton.innerText = "🔴 Stop Reading";
+                        }
+                    })
+                    .catch(error => console.error("❌ Error:", error));
+                });
+            } else {
+                console.log("⚠️ Read Aloud button NOT FOUND!");
+            }
+        });
+
+        
+        document.addEventListener("DOMContentLoaded", function () {
+            let music = document.getElementById("background-music");
+            let musicToggle = document.getElementById("music-toggle");
+
+            musicToggle.addEventListener("click", function () {
+                if (music.paused) {
+                    music.play().then(() => {
+                        musicToggle.innerText = "⏸️ Pause Music";
+                    }).catch(error => {
+                        console.error("Autoplay blocked:", error);
+                        alert("Please click the button to allow music playback.");
+                    });
+                } else {
+                    music.pause();
+                    musicToggle.innerText = "🎵 Play Music";
+                }
+            });
+        });
+
+
+    </script>
+</head>
+<body>
+    <audio id="background-music" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-13.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+    
+    
+
+    
+    <div class="main-container">
+        <h2 class="title">The Hill We Climb</h2>
+        <p class="instructions">Amanda Gorman</p>
+    
+
+        <div class="buttons">
+            <button id="toggle-highlight" onclick="toggleHighlightOptions()">✍️</button>
+
+            <div id="highlight-options" class="hidden">
+                <button onclick="highlightText('yellow')" id="yellow">Yellow</button>
+                <button onclick="highlightText('red')" id="red">Red</button>
+                <button onclick="highlightText('blue')" id="blue">Indigo</button>
+                <button onclick="highlightText('green')"  id="green">Green</button>
+            </div>
+            
+            <button onclick="addNote()">💬</button>
+            <button id="read-aloud">🔊</button>
+
+        </div>
+
+        
+
+
+        <div class="text-content">
+            <div class="column" id="left-column">
+                <p>When day comes we ask ourselves, where can we find light in this neverending shade? The loss we carry, 
+                a sea we must wade. We’ve braved the belly of the beast, we’ve learned that quiet isn’t always peace and the norms 
+                and notions of what just is, isn’t always justice. And yet the dawn is ours before we knew it, somehow we do it, somehow we’ve 
+                weathered and witnessed a nation that isn’t broken but simply unfinished. 
+                </p>
+            </div>
+            <div class="column" id="right-column">
+                <p>We, the successors of a country and a time where a skinny black girl descended from slaves and raised by a single mother 
+                can dream of becoming president only to find herself reciting for one. And, yes, we are far from polished, far from pristine, 
+                but that doesn’t mean we are striving to form a union that is perfect, we are striving to forge a union with purpose, to compose a 
+                country committed to all cultures, colors, characters and conditions of man.</p>
+            </div>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar"></div>
+            <div class="progress-circle"></div>
+        </div>
+        
+        <div class="top-right-menu">
+            <div class="menu-button"><i class="fas fa-users">👤</i></div>
+            <div class="menu-button"><i class="fas fa-bookmark">🔖</i></div>
+            <div class="menu-button"><i class="fas fa-search">🔍</i></div>
+            <button class="menu-button" id="music-toggle">🎵</button>
+        </div>
+
+        
+
+        <div id="notes-container"></div>
+    </div>
+
+    <!-- Custom Toast Notification -->
+<div id="custom-alert" class="custom-alert hidden">
+    <p id="alert-message"></p>
+</div>
+
+<!-- Custom Modal for Notes -->
+<div id="custom-modal" class="custom-modal hidden">
+    <div class="modal-content">
+        <h3>Add a Note</h3>
+        <p id="modal-text"></p>
+        <textarea id="modal-input" placeholder="Type your note here..."></textarea>
+        <div class="modal-buttons">
+            <button onclick="closeModal(true)">Save</button>
+            <button onclick="closeModal(false)">Cancel</button>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+</body>
+</html>
