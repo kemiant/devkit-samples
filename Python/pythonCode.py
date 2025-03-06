@@ -1,5 +1,8 @@
-#pip3 install flask
+#cmd shift p to make sure you are using the right interpreter
+#then make sure you are in the right terminal
+# pip3 install flask
 #pip3 install nrclex
+
 from flask import Flask, request, send_file, jsonify
 from datafeel.device import discover_devices
 from nrclex import NRCLex
@@ -9,7 +12,7 @@ from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet
 import nltk
-import speech_recognition as sr
+#import speech_recognition as sr
 import pyttsx3
 import threading
 import queue
@@ -164,6 +167,8 @@ def analyze_sentiment():
     if not text:
         return jsonify({"error": "No text provided"}), 400
 
+
+    #possibly change this to tokenize and remove words that don't have feelings?
     # Tokenize and lemmatize each word
     words = [lemmatizer.lemmatize(word) for word in word_tokenize(text)]
 
